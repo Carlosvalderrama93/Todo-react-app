@@ -6,50 +6,51 @@ function App() {
     const savedTodos = localStorage.getItem("todos");
     if (savedTodos) {
       return JSON.parse(savedTodos);
-    } else {
-      return [];
-    }
+    } else [];
   });
-  const [todo, setTodo] = useState("");
+  const [task, setTask] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [currentTodo, setCurrenttodo] = useState({});
+  const [currentTask, setCurrentTask] = useState({});
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  function handleInputChange(e) {
-    setTodo(e.target.value);
-  }
+  const handleInputChange = (e) => setTask(e.target.value);
 
   function handleFormSubmit(e) {
+    let id;
     e.preventDefault();
-    if (todo !== "") {
-      setTodos([...todos, { id: todos.length + 1, text: todo.trim() }]);
+    if (task !== "") {
+      if (todos.length === 0) {
+        id = 1;
+      } else {
+        id = todos[todos.length - 1].id + 1;
+      }
+      setTodos([...todos, { id: id, text: task.trim() }]);
+      console.log("id de la ultima posición +1: ", todos);
     }
-    setTodo("");
+    setTask("");
   }
 
   function handleDeleteClick(id) {
-    const removeItem = todos.filter((todo) => {
-      return todo.id !== id;
+    const removeItem = todos.filter((task) => {
+      return task.id !== id;
     });
     setTodos(removeItem);
   }
 
-  function handleEditInputChange(e) {
-    setCurrenttodo({ ...currentTodo, text: e.target.value });
-    console.log(currentTodo);
-  }
+  const handleEditInputChange = (e) =>
+    setCurrentTask({ ...currentTask, text: e.target.value });
 
-  function handleEditClick(todo) {
+  function handleEditClick(task) {
     setIsEditing(true);
-    setCurrenttodo({ ...todo });
+    setCurrentTask({ ...task });
   }
 
-  function handleUpdateTodo(id, updatedTodo) {
-    const updatedItem = todos.map((todo) => {
-      return todo.id === id ? updatedTodo : todo;
+  function handleUpdateTask(id, updatedTask) {
+    const updatedItem = todos.map((task) => {
+      return task.id === id ? updatedTask : task;
     });
     setIsEditing(false);
     setTodos(updatedItem);
@@ -57,7 +58,7 @@ function App() {
 
   function handleEditFormSubmit(e) {
     e.preventDefault();
-    handleUpdateTodo(currentTodo.id, currentTodo);
+    handleUpdateTask(currentTask.id, currentTask);
   }
 
   return (
@@ -65,38 +66,34 @@ function App() {
       <h1>Todo App</h1>
       {isEditing ? (
         <form onSubmit={handleEditFormSubmit}>
-          <h2>Edit Todo</h2>
-          <label htmlFor="editTodo">Edit todo:</label>
           <input
             name="editTodo"
             type="text"
             placeholder="Edit task"
-            value={currentTodo.text} //Esta linea no la entiendo.
-            onChange={handleEditInputChange}
+            value={currentTask.text}
+            onChange={handleEditInputChange} // Tampoco sé que hace exactamente esta liena.
           />
           <button type="submit">Update</button>
           <button onClick={() => setIsEditing(false)}>Cancel</button>
         </form>
       ) : (
         <form onSubmit={handleFormSubmit}>
-          <h2>Add Todo</h2>
-          <label htmlFor="todo">Add todo: </label>
           <input
-            name="todo"
+            name="task"
             type="text"
             placeholder="Create a new task"
-            value={todo} //Esta linea no la entiendo.
+            value={task}
             onChange={handleInputChange}
           />
         </form>
       )}
 
-      <ul className="todo-list">
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            {todo.text}
-            <button onClick={() => handleEditClick(todo)}>Edit</button>
-            <button onClick={() => handleDeleteClick(todo.id)}>Delete</button>
+      <ul className="task-list">
+        {todos.map((task) => (
+          <li key={task.id}>
+            {task.text}
+            <button onClick={() => handleEditClick(task)}>Edit</button>
+            <button onClick={() => handleDeleteClick(task.id)}>Delete</button>
           </li>
         ))}
       </ul>
