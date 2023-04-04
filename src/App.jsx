@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
+function getTodos() {
+  const getTodos = localStorage.getItem("todos")
+    ? JSON.parse(localStorage.getItem("todos"))
+    : [];
+  return getTodos;
+}
+
 function App() {
-  const [todos, setTodos] = useState(() => {
-    const savedTodos = localStorage.getItem("todos");
-    if (savedTodos) {
-      return JSON.parse(savedTodos);
-    } else [];
-  });
+  const [todos, setTodos] = useState(getTodos());
   const [task, setTask] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [currentTask, setCurrentTask] = useState({});
