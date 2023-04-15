@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 
 function getTodos() {
   const getTodos = localStorage.getItem("todos")
@@ -8,17 +7,23 @@ function getTodos() {
   return getTodos;
 }
 
-function App() {
+function saveTodos(todos) {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+export default function App() {
   const [todos, setTodos] = useState(getTodos());
   const [task, setTask] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [currentTask, setCurrentTask] = useState({});
 
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
+    saveTodos(todos);
   }, [todos]);
 
-  const handleInputChange = (e) => setTask(e.target.value);
+  function handleInputChange(e) {
+    setTask(e.target.value);
+  }
 
   function handleFormSubmit(e) {
     let id;
@@ -73,7 +78,7 @@ function App() {
             type="text"
             placeholder="Edit task"
             value={currentTask.text}
-            onChange={handleEditInputChange} // Tampoco sé que hace exactamente esta liena.
+            onChange={handleEditInputChange} // Tampoco sé que hace exactamente esta linea.
           />
           <button type="submit">Update</button>
           <button onClick={() => setIsEditing(false)}>Cancel</button>
@@ -102,5 +107,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
