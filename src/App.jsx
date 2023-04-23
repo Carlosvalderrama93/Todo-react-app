@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 
+function saveTodos(todos) {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
 function getTodos() {
   const getTodos = localStorage.getItem("todos")
     ? JSON.parse(localStorage.getItem("todos"))
@@ -7,55 +11,50 @@ function getTodos() {
   return getTodos;
 }
 
-function saveTodos(todos) {
-  localStorage.setItem("todos", JSON.stringify(todos));
+function formatTask(task) {
+  task = task.trim(); // deleting ending and starting spaces
+  task = task ? task.charAt(0).toUpperCase() + task.slice(1) : null; // transform the firts letter in uppercase
+  const formatedTask = [];
+  for (let i = 0; i < task.length; i++) {
+    task[i] === " " && task[i + 1] === " "
+      ? undefined
+      : formatedTask.push(task[i]);
+  }
+
+  task = formatedTask.join(""); // Transform the array into a String
+  return task;
 }
 
+function handleEditFormSubmit(e) {
+  e.preventDefault();
+  handleUpdateTask(currentTask.id, currentTask);
+}
+//APP()--------------APP()----------------APP()
 export default function App() {
   const [todos, setTodos] = useState(getTodos());
-  const [task, setTask] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
+  const [task, setTask] = useState();
   const [currentTask, setCurrentTask] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     saveTodos(todos);
+    setCurrentTask({});
   }, [todos]);
 
-  function handleInputChange(e) {
-    setTask(e.target.value);
-  }
-
+  //CreateTask
   function handleFormSubmit(e) {
-    let id;
     e.preventDefault();
-    if (task !== "") {
-      if (todos.length === 0) {
-        id = 1;
-      } else {
-        id = todos[todos.length - 1].id + 1;
-      }
-      setTodos([...todos, { id: id, text: task.trim() }]);
-      console.log("id de la ultima posición +1: ", todos);
-    }
+    const formatedTask = formatTask(task);
+    const id = todos.length ? todos[todos.length - 1].id + 1 : 1; // adding an id to the new task.
+    formatedTask
+      ? setTodos([...todos, { id: id, text: formatedTask }])
+      : alert("write a task");
     setTask("");
   }
 
-  function handleDeleteClick(id) {
-    const removeItem = todos.filter((task) => {
-      return task.id !== id;
-    });
-    setTodos(removeItem);
-  }
-
-  const handleEditInputChange = (e) =>
-    setCurrentTask({ ...currentTask, text: e.target.value });
-
-  function handleEditClick(task) {
-    setIsEditing(true);
-    setCurrentTask({ ...task });
-  }
-
+  //UpdateTask
   function handleUpdateTask(id, updatedTask) {
+    updatedTask.text = formatTask(updatedTask.text);
     const updatedItem = todos.map((task) => {
       return task.id === id ? updatedTask : task;
     });
@@ -63,10 +62,31 @@ export default function App() {
     setTodos(updatedItem);
   }
 
-  function handleEditFormSubmit(e) {
-    e.preventDefault();
-    handleUpdateTask(currentTask.id, currentTask);
+  //DeleteTask
+  function handleDeleteClick(id) {
+    const removeItem = todos.filter((task) => {
+      return task.id !== id;
+    });
+    setTodos(removeItem);
   }
+
+  // InputText newTask
+  function handleInputChange(e) {
+    setTask(e.target.value);
+  }
+
+  // InputText updateTask
+  function handleEditInputChange(e) {
+    setCurrentTask({ ...currentTask, text: e.target.value });
+  }
+
+  //'Edit' button clicked
+  function handleEditClick(task) {
+    setIsEditing(true);
+    setCurrentTask({ ...task });
+  }
+
+  // FIN---------FIN----------FIN
 
   return (
     <div className="App">
